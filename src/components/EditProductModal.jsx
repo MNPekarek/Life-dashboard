@@ -58,6 +58,7 @@ const Button = styled.button`
 const EditProductModal = ({ show, onClose, product, onUpdate }) => {
   const [form, setForm] = useState({
     title: "",
+    _id: "",
     description: "",
     thumbnail: "",
     price: "",
@@ -70,6 +71,7 @@ const EditProductModal = ({ show, onClose, product, onUpdate }) => {
     if (product) {
       setForm({
         title: product.title || "",
+        _id: product._id || "",
         price: product.price || "",
         description: product.description || "",
         thumbnail: product.thumbnail || "",
@@ -99,6 +101,7 @@ const EditProductModal = ({ show, onClose, product, onUpdate }) => {
       <Modal>
         <Title>✏️ Editar Producto</Title>
         <Input name="title" value={form.title} onChange={handleChange} placeholder="Título" />
+        <Input name="_id" value={form._id} onChange={handleChange} placeholder="id" />
         <Input name="price" value={form.price} onChange={handleChange} placeholder="Precio" />
         <Input name="description" value={form.description} onChange={handleChange} placeholder="Descripción" />
         <Input name="thumbnail" value={form.thumbnail} onChange={handleChange} placeholder="Imagen" />
