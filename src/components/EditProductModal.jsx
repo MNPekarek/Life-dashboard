@@ -90,7 +90,7 @@ const EditProductModal = ({ show, onClose, product, onUpdate }) => {
 
   const handleSubmit = async () => {
     try {
-      const res = await axios.put(`https://https://life-project-api-db-production.up.railway.app//api/products/${product._id}`, form);
+      const res = await axios.put(`https://life-project-api-db-production.up.railway.app//api/products/${product._id}`, form);
       onUpdate(res.data.payload); // actualiza en el frontend
       onClose(); // cierra el modal
     } catch (err) {
