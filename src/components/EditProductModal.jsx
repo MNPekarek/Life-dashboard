@@ -33,6 +33,8 @@ const Input = styled.input`
   margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
+  background-color: ${({ disabled }) => (disabled ? "#f5f5f5" : "white")};
+  color: ${({ disabled }) => (disabled ? "#888" : "black")};
 `;
 
 const ButtonRow = styled.div`
@@ -88,7 +90,7 @@ const EditProductModal = ({ show, onClose, product, onUpdate }) => {
 
   const handleSubmit = async () => {
     try {
-      const res = await axios.put(`https://life-project-api-db.onrender.com/api/products/${product._id}`, form);
+      const res = await axios.put(`https://https://life-project-api-db-production.up.railway.app//api/products/${product._id}`, form);
       onUpdate(res.data.payload); // actualiza en el frontend
       onClose(); // cierra el modal
     } catch (err) {
@@ -101,7 +103,7 @@ const EditProductModal = ({ show, onClose, product, onUpdate }) => {
       <Modal>
         <Title>✏️ Editar Producto</Title>
         <Input name="title" value={form.title} onChange={handleChange} placeholder="Título" />
-        <Input name="_id" value={form._id} onChange={handleChange} placeholder="id" />
+        <Input name="_id" value={form._id} readOnly disabled placeholder="ID del producto" />
         <Input name="price" value={form.price} onChange={handleChange} placeholder="Precio" />
         <Input name="description" value={form.description} onChange={handleChange} placeholder="Descripción" />
         <Input name="thumbnail" value={form.thumbnail} onChange={handleChange} placeholder="Imagen" />
