@@ -1,69 +1,38 @@
+// src/page/Home.jsx
 import styled from "styled-components";
-import Dashboard from "../components/Dashboard.jsx";
-import ProductTable from "../components/ProductTable.jsx";
-import CrearProductoModal from "../components/CreateProduct.jsx";
-import { useState } from "react";
-import DashboardOrders from "../components/DashboardOrders/DashboardOrders.jsx";
+import { Link } from "react-router-dom";
 
 const Container = styled.div`
   min-height: 100vh;
-  padding: 2rem;
-  background: linear-gradient(135deg, #010707, #0e6f67, #3f914a, #738436);
-`;
-// background: linear-gradient(135deg, #010707, #0e6f67, #3f914a, #738436);
-
-const ButtonGroup = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #0f766e, #22c55e);
+  color: white;
+  text-align: center;
   gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
 `;
 
-const StyledButton = styled.button`
-  background-color: ${({ active }) => (active ? "#3f914a" : "#ffffff22")};
-  color: ${({ active }) => (active ? "#fff" : "#eee")};
-  border: 2px solid #3f914a;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-
+const StyledLink = styled(Link)`
+  background: #22c55e;
+  color: white;
+  padding: 0.8rem 1.4rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease;
   &:hover {
-    background-color: #3f914a;
-    color: #fff;
+    background: #16a34a;
   }
 `;
 
-const Home = () => {
-  const [view, setView] = useState("products");
-
+export default function Home() {
   return (
     <Container>
-      <Dashboard />
-
-      <ButtonGroup>
-        <StyledButton
-          active={view === "products"}
-          onClick={() => setView("products")}
-        >
-          Ver productos
-        </StyledButton>
-        <StyledButton
-          active={view === "orders"}
-          onClick={() => setView("orders")}
-        >
-          Ver pedidos
-        </StyledButton>
-      </ButtonGroup>
-
-      {view === "products" && <ProductTable />}
-      {view === "orders" && <DashboardOrders />}
+      <h1>🌿 Bienvenido a Life Admin</h1>
+      <p>Accedé al panel de administración para gestionar tus productos y pedidos.</p>
+      <StyledLink to="/dashboard">Ir al Dashboard</StyledLink>
     </Container>
-
   );
-};
-
-export default Home;
+}

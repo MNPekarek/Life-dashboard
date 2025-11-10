@@ -1,10 +1,11 @@
+// src/components/CreateProduct.jsx
 import React, { useState } from "react";
 import styled from "styled-components";
 import useProducts from "../hooks/useProducts";
 
 const FloatingButton = styled.button`
   margin-left: 2rem;
-  background-color: #2ecc71;
+  background-color: #22c55e;
   color: white;
   font-size: 2rem;
   border: none;
@@ -14,68 +15,70 @@ const FloatingButton = styled.button`
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: background-color 0.2s ease;
-
   &:hover {
-    background-color: #27ae60;
+    background-color: #16a34a;
   }
 `;
 
 const Overlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1300;
 `;
 
 const Modal = styled.div`
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #2c3e50;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.4rem;
+  width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
 `;
 
 const Input = styled.input`
-  padding: 0.75rem;
-  border: none;
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 0.7rem;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.6);
-  color: #2c3e50;
-  font-size: 1rem;
+`;
+
+const Label = styled.label`
+  font-weight: 500;
+  font-size: .85rem;
+  margin-bottom: .3rem;
+  display: block;
+`;
+
+const Row = styled.div`
+  display: flex;
+  gap: .8rem;
+  margin-bottom: .7rem;
+  align-items: center;
 `;
 
 const SubmitButton = styled.button`
+  width: 100%;
   padding: 0.75rem;
-  background-color: #3498db;
+  background-color: #0f766e;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-
   &:hover {
-    background-color: #2980b9;
+    background-color: #115e59;
   }
 `;
 
 const CrearProductoModal = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { createProduct } = useProducts();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -84,87 +87,115 @@ const CrearProductoModal = () => {
     stock: "",
     quantity: "",
     category: "",
+    featured: false,
+    offerActive: false,
+    offerDiscount: 0,
   });
 
-  const { createProduct } = useProducts();
-
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await createProduct(formData);      
-      setIsOpen(false);
-      setFormData({
-        title: "",
-        description: "",
-        thumbnail: "",
-        price: "",
-        stock: "",
-        quantity: "",
-        category: "",
-      });
-    } catch (error) {
-      console.error("Error al crear producto:", error);
-    }
+
+    // adaptamos al formato que espera tu API nueva:
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      thumbnail: formData.thumbnail,
+      price: Number(formData.price),
+      stock: Number(formData.stock),
+      quantity: formData.quantity,
+      category: formData.category,
+      featured: formData.featured,
+      offer: {
+        active: formData.offerActive,
+        discount: Number(formData.offerDiscount) || 0,
+      },
+    };
+
+    await createProduct(payload);
+    setIsOpen(false);
+    setFormData({
+      title: "",
+      description: "",
+      thumbnail: "",
+      price: "",
+      stock: "",
+      quantity: "",
+      category: "",
+      featured: false,
+      offerActive: false,
+      offerDiscount: 0,
+    });
   };
 
   return (
     <>
-      <FloatingButton onClick={() => setIsOpen(true)}>＋</FloatingButton>
-
+      <FloatingButton onClick={() => setIsOpen(true)}>+</FloatingButton>
       {isOpen && (
         <Overlay onClick={() => setIsOpen(false)}>
           <Modal onClick={(e) => e.stopPropagation()}>
-            <h2>Crear Producto</h2>
-            <Form onSubmit={handleSubmit}>
-              <Input
-                name="title"
-                placeholder="Nombre"
-                value={formData.title}
-                onChange={handleChange}
-              />
-              <Input
-                name="description"
-                placeholder="Descripcion"
-                value={formData.description}
-                onChange={handleChange}
-              />
-              <Input
-                name="thumbnail"
-                placeholder="Imagen"
-                value={formData.thumbnail}
-                onChange={handleChange}
-              />
-              <Input
-                name="price"
-                placeholder="Precio"
-                value={formData.price}
-                onChange={handleChange}
-              />
-              <Input
-                name="stock"
-                placeholder="Stock"
-                value={formData.stock}
-                onChange={handleChange}
-              />
-              <Input
-                name="quantity"
-                placeholder="Cantidad"
-                value={formData.quantity}
-                onChange={handleChange}
-              />
-              <Input
-                name="categoria"
-                placeholder="Categoría"
-                value={formData.categoria}
-                onChange={handleChange}
-              />
+            <h2>Nuevo producto</h2>
+            <form onSubmit={handleSubmit}>
+              <Label>Nombre</Label>
+              <Input name="title" value={formData.title} onChange={handleChange} required />
+              <Label>Descripción</Label>
+              <Input name="description" value={formData.description} onChange={handleChange} />
+              <Label>Imagen (URL)</Label>
+              <Input name="thumbnail" value={formData.thumbnail} onChange={handleChange} />
+              <Label>Precio</Label>
+              <Input name="price" type="number" value={formData.price} onChange={handleChange} />
+              <Label>Stock</Label>
+              <Input name="stock" type="number" value={formData.stock} onChange={handleChange} />
+              <Label>Categoría</Label>
+              <Input name="category" value={formData.category} onChange={handleChange} />
+              <Label>Presentación / cantidad</Label>
+              <Input name="quantity" value={formData.quantity} onChange={handleChange} />
+
+              <Row>
+                <input
+                  type="checkbox"
+                  name="featured"
+                  checked={formData.featured}
+                  onChange={handleChange}
+                  id="featured"
+                />
+                <label htmlFor="featured">Marcar como destacado ⭐</label>
+              </Row>
+
+              <Row>
+                <input
+                  type="checkbox"
+                  name="offerActive"
+                  checked={formData.offerActive}
+                  onChange={handleChange}
+                  id="offerActive"
+                />
+                <label htmlFor="offerActive">Está en oferta 🔥</label>
+              </Row>
+
+              {formData.offerActive && (
+                <>
+                  <Label>Descuento (%)</Label>
+                  <Input
+                    name="offerDiscount"
+                    type="number"
+                    min="0"
+                    max="90"
+                    value={formData.offerDiscount}
+                    onChange={handleChange}
+                  />
+                </>
+              )}
 
               <SubmitButton type="submit">Crear</SubmitButton>
-            </Form>
+            </form>
           </Modal>
         </Overlay>
       )}

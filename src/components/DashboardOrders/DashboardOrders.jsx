@@ -8,6 +8,7 @@ const DashboardOrders = () => {
     setFilterStatus,
     setFilterDate,
     updateOrderStatus,
+    deleteOrder,
   } = useOrders();
 
   return (
@@ -20,6 +21,7 @@ const DashboardOrders = () => {
       <OrdersTable
         orders={orders}
         updateOrderStatus={updateOrderStatus}
+        deleteOrder={deleteOrder}
       />
     </div>
   );

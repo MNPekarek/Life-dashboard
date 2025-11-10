@@ -1,47 +1,72 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL || "https://life-project-api-db-production.up.railway.app";
 
 export const useOrders = () => {
-    const [orders, setOrders] = useState([]);
-    const [filterStatus, setFilterStatus] = useState("todos");
-    const [filterDate, setFilterDate] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [filterStatus, setFilterStatus] = useState("todos");
+  const [filterDate, setFilterDate] = useState("");
 
-    useEffect(() => {
-        fetch("https://life-project-api-db-production.up.railway.app/api/orders")
-        .then(res => res.json())
-        .then(data => setOrders(data))
-        .catch(err => console.log("Error al cargar los pedidos", err))
-    }, []);
-
-    const updateOrderStatus = async (orderId, newStatus) => {
+  // ✅ obtener pedidos filtrados
+  const fetchOrders = async () => {
     try {
-      const res = await fetch(`/api/orders/${orderId}`, {
+      let url = `${API_URL}/api/orders`;
+
+      if (filterStatus !== "todos") {
+        url = `${API_URL}/api/orders/by-status?status=${filterStatus}`;
+      } else if (filterDate) {
+        url = `${API_URL}/api/orders/by-date?fecha=${filterDate}`;
+      }
+
+      const res = await fetch(url);
+      const data = await res.json();
+      setOrders(data);
+    } catch (err) {
+      console.error("Error al cargar pedidos:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [filterStatus, filterDate]);
+
+  // ✅ actualizar estado
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      const res = await fetch(`${API_URL}/api/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
+
       const updated = await res.json();
-      setOrders(prev =>
-        prev.map(order => (order._id === orderId ? updated : order))
+
+      setOrders((prev) =>
+        prev.map((order) => (order._id === orderId ? updated : order))
       );
     } catch (err) {
       console.error("Error al actualizar estado:", err);
     }
   };
 
-   const filteredOrders = orders.filter(order => {
-    const matchStatus =
-      filterStatus === "todos" || order.status === filterStatus;
-    const matchDate =
-      !filterDate ||
-      new Date(order.createdAt).toISOString().slice(0, 10) === filterDate;
-    return matchStatus && matchDate;
-  });
+  // ✅ eliminar pedido
+  const deleteOrder = async (orderId) => {
+    if (!window.confirm("¿Seguro que querés eliminar este pedido?")) return;
+    try {
+      await fetch(`${API_URL}/api/orders/${orderId}`, {
+        method: "DELETE",
+      });
+      setOrders((prev) => prev.filter((order) => order._id !== orderId));
+    } catch (err) {
+      console.error("Error al eliminar pedido:", err);
+    }
+  };
 
   return {
-    orders: filteredOrders,
+    orders,
     setFilterStatus,
     setFilterDate,
     updateOrderStatus,
+    deleteOrder,
   };
-}
+};
